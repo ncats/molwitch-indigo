@@ -1,0 +1,4 @@
+gov.nih.ncats.molwitch.indigo.spi.writers.IndigoMolWriterFactory
+gov.nih.ncats.molwitch.indigo.spi.writers.IndigoSmilesWriterFactory
+gov.nih.ncats.molwitch.indigo.spi.writers.IndigoSdfWriterFactory
+gov.nih.ncats.molwitch.indigo.spi.writers.IndigoSmartsWriterFactory
