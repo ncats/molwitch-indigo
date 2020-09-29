@@ -9,6 +9,9 @@ import gov.nih.ncats.molwitch.AtomCoordinates;
 import gov.nih.ncats.molwitch.Bond;
 import gov.nih.ncats.molwitch.Chirality;
 import gov.nih.ncats.molwitch.isotopes.Elements;
+import gov.nih.ncats.molwitch.isotopes.Isotope;
+import gov.nih.ncats.molwitch.isotopes.IsotopeFactory;
+import gov.nih.ncats.molwitch.isotopes.NISTIsotopeFactory;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -130,7 +133,17 @@ public class IndigoAtom implements Atom {
 
     @Override
     public int getMassNumber() {
-        return (int) atom.mostAbundantMass();
+        int isotope = atom.isotope();
+        if(isotope ==0){
+            return 0;
+        }
+        Optional<Isotope> found=NISTIsotopeFactory.INSTANCE.getIsotopesFor(atom.atomicNumber()).stream()
+                                    .filter(i-> i.getIsotopicComposition().meetsCriteria(isotope))
+                                    .findFirst();
+        if(found.isPresent()){
+            return found.get().getMassNumber();
+        }
+        return 0;
     }
 
     @Override
@@ -171,7 +184,12 @@ public class IndigoAtom implements Atom {
     public boolean hasValenceError() {
         //if there's a problem returns string with message
         //and empty string if correct
+//        atom.checkValence();
         String valenceCheck = atom.checkBadValence();
+//
+//        System.out.println("valenceCheckBad " + valenceCheck);
+//        System.out.println("calling actual checkValence " + atom.checkValence());
+//        System.out.println("valenceCheckBad again " +  atom.checkBadValence());
        return !valenceCheck.isEmpty();
     }
 

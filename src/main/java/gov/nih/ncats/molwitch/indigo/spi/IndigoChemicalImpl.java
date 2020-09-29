@@ -184,11 +184,16 @@ public class IndigoChemicalImpl implements ChemicalImpl<IndigoChemicalImpl> {
 
     @Override
     public List<DoubleBondStereochemistry> getDoubleBondStereochemistry() {
-        for (IndigoObject atom : mol.iterateAlleneCenters()){
-            System.out.printf("atom %d -- stereocenter type %d\n", atom.index(), atom.stereocenterType());
+        List<DoubleBondStereochemistry> list = new ArrayList<>();
+        for (IndigoObject bond : mol.iterateBonds()){
+            int bondStereo = bond.bondStereo();
+            //CIS = 7 TRANS = 8
+            if(bondStereo ==7 || bondStereo == 8){
+                list.add(new IndigoDoubleBondStereo(bond));
+            }
 
         }
-        return Collections.emptyList();
+        return list;
     }
 
     @Override
@@ -404,7 +409,11 @@ public class IndigoChemicalImpl implements ChemicalImpl<IndigoChemicalImpl> {
 
     @Override
     public List<SGroup> getSGroups() {
-        return null;
+        List<SGroup> list = new ArrayList<>();
+        for(IndigoObject obj : mol.iterateSGroups()){
+            list.add(new IndigoSgroup(obj, obj.getSGroupType()));
+        }
+        return list;
     }
 
     @Override
@@ -427,13 +436,34 @@ public class IndigoChemicalImpl implements ChemicalImpl<IndigoChemicalImpl> {
        //TODO
     }
 
-    private class IndogSGroup implements SGroup{
+    private class IndigoSgroup implements SGroup{
 
         private final SGroupType type;
         private IndigoObject sgroup;
-        IndogSGroup(IndigoObject sgroup, SGroupType type){
-            this.type = type;
+        IndigoSgroup(IndigoObject sgroup, int type){
+            this.type = convertType(type);
             this.sgroup = sgroup;
+        }
+        private SGroupType convertType(int type){
+            switch(type){
+                case Indigo.SG_TYPE_GEN : return SGroupType.GENERIC;
+                case Indigo.SG_TYPE_DAT : return SGroupType.DATA;
+                case Indigo.SG_TYPE_SUP : return SGroupType.SUPERATOM_OR_ABBREVIATION;
+                case Indigo.SG_TYPE_SRU : return SGroupType.SRU;
+                case Indigo.SG_TYPE_MUL : return SGroupType.MULTIPLE;
+                case Indigo.SG_TYPE_MON : return SGroupType.MONOMER;
+
+                case Indigo.SG_TYPE_MER : return SGroupType.MER;
+                case Indigo.SG_TYPE_COP : return SGroupType.COPOLOYMER;
+                case Indigo.SG_TYPE_CRO : return SGroupType.CROSSLINK;
+                case Indigo.SG_TYPE_MOD : return SGroupType.MODIFICATION;
+                case Indigo.SG_TYPE_GRA : return SGroupType.GRAFT;
+                case Indigo.SG_TYPE_COM: return SGroupType.COMPONENT;
+                case Indigo.SG_TYPE_MIX : return SGroupType.MIXTURE;
+                case Indigo.SG_TYPE_FOR : return SGroupType.FORMULATION;
+                case Indigo.SG_TYPE_ANY : return SGroupType.ANYPOLYMER;
+                default : return null;
+            }
         }
         @Override
         public SGroupType getType() {
@@ -462,12 +492,15 @@ public class IndigoChemicalImpl implements ChemicalImpl<IndigoChemicalImpl> {
 
         @Override
         public Stream<Atom> getOutsideNeighbors() {
-            return null;
+            //TODO
+            return Stream.empty();
         }
 
         @Override
         public Stream<SGroup> getParentHierarchy() {
-            return null;
+
+            //TODO
+            return Stream.empty();
         }
 
         @Override
@@ -730,6 +763,71 @@ public class IndigoChemicalImpl implements ChemicalImpl<IndigoChemicalImpl> {
         @Override
         public int getAtomCount() {
             return mol.countAtoms();
+        }
+    }
+
+    private class IndigoDoubleBondStereo implements DoubleBondStereochemistry{
+
+        private final IndigoObject stereoBond;
+        private DoubleBondStereo stereo;
+        public IndigoDoubleBondStereo(IndigoObject stereoBond) {
+            this.stereoBond = stereoBond;
+            int doubleBondIndex = stereoBond.index();
+            int value = stereoBond.bondStereo();
+            if(value ==7){
+                stereo = DoubleBondStereo.Z_CIS;
+            }else if(value ==8){
+                stereo = DoubleBondStereo.E_TRANS;
+
+            }else{
+                stereo = DoubleBondStereo.E_OR_Z;
+            }
+            //TODO handle either?
+
+            //TODO not sure how to get the ligand atoms without knowing how to get CIP values
+//            int atom1Index = stereoBond.source().index();
+//            int atom2Index = stereoBond.destination().index();
+//
+//            /*
+//                A
+//                 \
+//                 C =
+//                 /
+//                 X
+//             */
+//            for(IndigoObject b : mol.getAtom(atom1Index).iterateBonds()){
+//                int index = b.index();
+//                if(index !=doubleBondIndex){
+//                    IndigoObject sourceAtom = b.source();
+//                    sourceAtom.
+//                    int atomIndex = sourceAtom.index();
+//
+//                    if(atomIndex == atom1Index){
+//                        b.destination()
+//                    }
+//                }
+//            }
+        }
+
+        @Override
+        public DoubleBondStereo getStereo() {
+            return stereo;
+        }
+
+        @Override
+        public Bond getDoubleBond() {
+            return getBond(stereoBond.index());
+        }
+
+        @Override
+        public Atom getLigand(int i) {
+
+            return null;
+        }
+
+        @Override
+        public Bond getLigandBond(int i) {
+            return null;
         }
     }
 }

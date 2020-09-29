@@ -14,7 +14,8 @@ public class IndigoUtil {
         //by default indigo sets mol files to auto which writes v2000 unless it needs to
         //which is very reasonable, but doesn't match molwitch which writes to 2000 unless told not to.
         //by defaulting to 2000 we should save a lot of unessessary cloning of Indigo objects to reset settings
-        indigo.setOption("molfile-saving-mode", "2000");
+        System.out.println("initial version of molfile saving mode = " + indigo.getOption("molfile-saving-mode"));
+//        indigo.setOption("molfile-saving-mode", "2000");
         return indigo;
     });
     private static ThreadLocal<IndigoInchi> indigoInchiThreadLocal = ThreadLocal.withInitial(()->new IndigoInchi(indigoThreadLocal.get()));

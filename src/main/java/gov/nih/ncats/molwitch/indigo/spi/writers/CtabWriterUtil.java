@@ -35,9 +35,10 @@ final class CtabWriterUtil {
                     }
                         break;
 
-                    case V3000:
-                        indigo.setOption("molfile-saving-mode", "3000");
+                    case V3000: System.out.println("here");
 
+                        indigo.setOption("molfile-saving-mode", "3000");
+                            break;
 
                 }
             }
