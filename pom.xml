@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.epam.indigo</groupId>
             <artifactId>indigo-inchi</artifactId>
-            <version>1.4.0-beta.r0</version>
+            <version>1.27.0-dev.1</version>
         </dependency>
         <dependency>
             <groupId>gov.nih.ncats</groupId>
